@@ -10,8 +10,19 @@ import scala.concurrent.duration._
   */
 object RunImages {
 
+  val videoFile = new File("target/video.mp4")
+  val root = new File("/Users/martonpapp/Documents/geotag/100TTCAM")
+//  val root = new File("/Volumes/TT_CAM/DCIM/100TTCAM/")
+
+  val imgList = root
+    .listFiles()
+    .filter(_.lastModified() > System.currentTimeMillis() - 1.day.toMillis)
+    .to[Seq]
+    .sortBy(_.lastModified())
+    .filter(_.getName.endsWith(".JPG"))
+    .filterNot(_.getName.startsWith("."))
+
   def main(args: Array[String]): Unit = {
-    val videoFile = new File("target/video.mp4")
 
 //    val encoder = new SequenceEncoder(videoFile)
 //    encoder.encodeNativeFrame()
@@ -21,21 +32,15 @@ object RunImages {
 
 
 
-    val root = new File("/Volumes/TT_CAM/DCIM/100TTCAM/")
 
-    val imgList = root
-      .listFiles()
-      .filter(_.lastModified() > System.currentTimeMillis() - 1.day.toMillis)
-      .to[Seq]
-      .sortBy(_.lastModified())
-      .filter(_.getName.endsWith(".JPG"))
-      .filterNot(_.getName.startsWith("."))
-      .map(_.getAbsolutePath)
+    val imgList2 =
+      imgList
+        .map(_.getAbsolutePath)
 //      .take(100)
     println(imgList.size)
 
     val itm = new JpegImagesToMovie()
-    itm.doIt(1024, 768, 5, imgList, oml)
+    itm.doIt(1024, 768, 5, imgList2, oml)
 
 
 
